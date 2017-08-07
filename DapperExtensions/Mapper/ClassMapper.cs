@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace DapperExtensions.Mapper
 {
@@ -111,6 +112,9 @@ namespace DapperExtensions.Mapper
                     {
                         keyMap = map;
                     }
+                    var KeyAttr = propertyInfo.GetCustomAttributes(typeof(KeyAttribute), true).ToArray();
+                    if (KeyAttr.Length > 0)
+                        keyMap = map;
                 }
             }
 
@@ -141,7 +145,7 @@ namespace DapperExtensions.Mapper
             Properties.Add(result);
             return result;
         }
-
+        
         /// <summary>
         /// Removes a propertymap entry
         /// </summary>

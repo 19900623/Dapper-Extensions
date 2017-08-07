@@ -2,6 +2,8 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DapperExtensions.Mapper
 {
@@ -13,7 +15,11 @@ namespace DapperExtensions.Mapper
         public AutoClassMapper()
         {
             Type type = typeof(T);
-            Table(type.Name);
+            var vTable = type.GetTypeInfo().GetCustomAttributes(typeof(TableAttribute), true).ToArray();
+            var TableName = vTable.Length == 0 ? type.Name : (vTable[0] as TableAttribute).Name;
+            Table(TableName);// Table(type.Name);
+            if (vTable.Length > 0 && !string.IsNullOrWhiteSpace((vTable[0] as TableAttribute).Schema))
+                Schema((vTable[0] as TableAttribute).Schema);
             AutoMap();
         }
     }

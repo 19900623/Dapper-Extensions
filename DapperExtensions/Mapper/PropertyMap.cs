@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 
@@ -26,7 +27,14 @@ namespace DapperExtensions.Mapper
         public PropertyMap(PropertyInfo propertyInfo)
         {
             PropertyInfo = propertyInfo;
-            ColumnName = PropertyInfo.Name;
+            var ColumnAttr = propertyInfo.GetCustomAttributes(typeof(ColumnAttribute), true).ToArray();
+            ColumnName = ColumnAttr.Length == 0 ? PropertyInfo.Name : (ColumnAttr[0] as ColumnAttribute).Name; // PropertyInfo.Name;
+
+            var cIgnore = propertyInfo.GetCustomAttributes(typeof(NotMappedAttribute), true).ToArray();
+            Ignored = cIgnore.Length > 0;
+
+            var cReadOnly = propertyInfo.GetCustomAttributes(typeof(DatabaseGeneratedAttribute), true).ToArray();
+            IsReadOnly = cReadOnly.Length > 0;
         }
 
         /// <summary>
