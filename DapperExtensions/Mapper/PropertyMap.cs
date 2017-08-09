@@ -33,8 +33,8 @@ namespace DapperExtensions.Mapper
             var cIgnore = propertyInfo.GetCustomAttributes(typeof(NotMappedAttribute), true).ToArray();
             Ignored = cIgnore.Length > 0;
 
-            var cReadOnly = propertyInfo.GetCustomAttributes(typeof(DatabaseGeneratedAttribute), true).ToArray();
-            IsReadOnly = cReadOnly.Length > 0;
+            //var cReadOnly = propertyInfo.GetCustomAttributes(typeof(DatabaseGeneratedAttribute), true).ToArray();
+            //IsReadOnly = cReadOnly.Length > 0;
         }
 
         /// <summary>
