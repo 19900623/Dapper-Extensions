@@ -239,7 +239,15 @@ namespace DapperExtensions
             return _dapper.GetPage<T>(Connection, predicate, sort, page, resultsPerPage, _transaction, commandTimeout, buffered, tableName, schemaName);
         }
 
+        public Page<T> GetPages<T>(object predicate, IList<ISort> sort, int page, int resultsPerPage, IDbTransaction transaction, int? commandTimeout, bool buffered, string tableName = null, string schemaName = null) where T : class
+        {
+            return _dapper.GetPages<T>(Connection, predicate, sort, page, resultsPerPage, transaction, commandTimeout, buffered, tableName, schemaName);
+        }
 
+        public Page<T> GetPages<T>(object predicate, IList<ISort> sort, int page, int resultsPerPage, int? commandTimeout, bool buffered, string tableName = null, string schemaName = null) where T : class
+        {
+            return _dapper.GetPages<T>(Connection, predicate, sort, page, resultsPerPage, _transaction, commandTimeout, buffered, tableName, schemaName);
+        }
 
         public IEnumerable<T> GetSet<T>(object predicate, IList<ISort> sort, int firstResult, int maxResults, IDbTransaction transaction, int? commandTimeout, bool buffered, string tableName = null, string schemaName = null) where T : class
         {

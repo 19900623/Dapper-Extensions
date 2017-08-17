@@ -22,6 +22,9 @@ namespace DapperExtensions
         bool Delete<T>(IDbConnection connection, object predicate, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName) where T : class;
         IEnumerable<T> GetList<T>(IDbConnection connection, object predicate, IList<ISort> sort, IDbTransaction transaction, int? commandTimeout, bool buffered, string tableName, string schemaName) where T : class;
         IEnumerable<T> GetPage<T>(IDbConnection connection, object predicate, IList<ISort> sort, int page, int resultsPerPage, IDbTransaction transaction, int? commandTimeout, bool buffered, string tableName, string schemaName) where T : class;
+
+        Page<T> GetPages<T>(IDbConnection connection, object predicate, IList<ISort> sort, int page, int resultsPerPage, IDbTransaction transaction, int? commandTimeout, bool buffered, string tableName, string schemaName) where T : class;
+
         IEnumerable<T> GetSet<T>(IDbConnection connection, object predicate, IList<ISort> sort, int firstResult, int maxResults, IDbTransaction transaction, int? commandTimeout, bool buffered, string tableName, string schemaName) where T : class;
         int Count<T>(IDbConnection connection, object predicate, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName) where T : class;
         IMultipleResultReader GetMultiple(IDbConnection connection, GetMultiplePredicate predicate, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName);
@@ -238,6 +241,17 @@ namespace DapperExtensions
             IClassMapper classMap = SqlGenerator.Configuration.GetMap<T>();
             IPredicate wherePredicate = GetPredicate(classMap, predicate);
             return GetPage<T>(connection, classMap, wherePredicate, sort, page, resultsPerPage, transaction, commandTimeout, buffered, tableName,schemaName);
+        }
+
+        public Page<T> GetPages<T>(IDbConnection connection, object predicate, IList<ISort> sort, int page, int resultsPerPage, IDbTransaction transaction, int? commandTimeout, bool buffered, string tableName, string schemaName) where T : class
+        {
+            var PageResult = new Page<T>() { CurrentPage = page, ItemsPerPage = resultsPerPage };
+            PageResult.TotalItems = Count<T>(connection, predicate, transaction, commandTimeout, tableName, schemaName);
+
+            IClassMapper classMap = SqlGenerator.Configuration.GetMap<T>();
+            IPredicate wherePredicate = GetPredicate(classMap, predicate);
+            PageResult.Items= GetPage<T>(connection, classMap, wherePredicate, sort, page, resultsPerPage, transaction, commandTimeout, buffered, tableName, schemaName);
+            return PageResult;
         }
 
         public IEnumerable<T> GetSet<T>(IDbConnection connection, object predicate, IList<ISort> sort, int firstResult, int maxResults, IDbTransaction transaction, int? commandTimeout, bool buffered, string tableName, string schemaName) where T : class

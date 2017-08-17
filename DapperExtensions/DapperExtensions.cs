@@ -256,6 +256,22 @@ namespace DapperExtensions
             return Instance.GetPage<T>(connection, predicate, sort, page, resultsPerPage, transaction, commandTimeout, buffered, tableName,schemaName);
         }
 
+
+        /// <summary>
+        /// Executes a select query using the specified predicate, returning an IEnumerable data typed as per T.
+        /// Data returned is dependent upon the specified page and resultsPerPage.
+        /// </summary>
+        public static Page<T> GetPages<T>(this IDbConnection connection, object predicate, IList<ISort> sort, int page, int resultsPerPage, IDbTransaction transaction = null, int? commandTimeout = null, bool buffered = false) where T : class
+            => GetPages<T>(connection, predicate, sort, page, resultsPerPage, null, null, transaction, commandTimeout, buffered);
+
+        public static Page<T> GetPages<T>(this IDbConnection connection, object predicate, IList<ISort> sort, int page, int resultsPerPage, string tableName, IDbTransaction transaction = null, int? commandTimeout = null, bool buffered = false) where T : class
+            => GetPages<T>(connection, predicate, sort, page, resultsPerPage, tableName, null, transaction, commandTimeout, buffered);
+
+        public static Page<T> GetPages<T>(this IDbConnection connection, object predicate, IList<ISort> sort, int page, int resultsPerPage, string tableName, string schemaName, IDbTransaction transaction = null, int? commandTimeout = null, bool buffered = false) where T : class
+        {
+            return Instance.GetPages<T>(connection, predicate, sort, page, resultsPerPage, transaction, commandTimeout, buffered, tableName, schemaName);
+        }
+
         /// <summary>
         /// Executes a select query using the specified predicate, returning an IEnumerable data typed as per T.
         /// Data returned is dependent upon the specified firstResult and maxResults.
