@@ -22,6 +22,50 @@ namespace DapperExtensions.Sql
         string QuoteString(string value);
     }
 
+    public enum ESqlDialect
+    {
+        DB2,
+        MySQL,
+        Oracle,
+        PostgreSql,
+        SqlCe,
+        Sqlite,
+        SqlServer
+    }
+
+    public class SqlDialectUtil
+    {
+        public static ISqlDialect ConvertESqlDialect(ESqlDialect sqlDialect)
+        {
+            ISqlDialect SqlDialect = null;
+            switch (sqlDialect)
+            {
+                case ESqlDialect.DB2:
+                    SqlDialect = new DB2Dialect();
+                    break;
+                case ESqlDialect.MySQL:
+                    SqlDialect = new MySqlDialect();
+                    break;
+                case ESqlDialect.Oracle:
+                    SqlDialect = new OracleDialect();
+                    break;
+                case ESqlDialect.PostgreSql:
+                    SqlDialect = new PostgreSqlDialect();
+                    break;
+                case ESqlDialect.SqlCe:
+                    SqlDialect = new SqlCeDialect();
+                    break;
+                case ESqlDialect.Sqlite:
+                    SqlDialect = new SqliteDialect();
+                    break;
+                case ESqlDialect.SqlServer:
+                    SqlDialect = new SqlServerDialect();
+                    break;
+            }
+            return SqlDialect;
+        }
+    }
+
     public abstract class SqlDialectBase : ISqlDialect
     {
         public virtual char OpenQuote

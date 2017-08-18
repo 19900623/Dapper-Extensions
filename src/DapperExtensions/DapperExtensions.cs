@@ -165,16 +165,16 @@ namespace DapperExtensions
             return (T)result;
         }
 
-        //public static async Task<T> GetAsync<T>(this IDbConnection connection, dynamic id, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        //    => await GetAsync<T>(connection, id, null, null, transaction, commandTimeout);
+        public static async Task<T> GetAsync<T>(this IDbConnection connection, dynamic id, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+            => await GetAsync<T>(connection, id, null, null, transaction, commandTimeout);
 
-        //public static async Task<T> GetAsync<T>(this IDbConnection connection, dynamic id, string tableName, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        // => await GetAsync<T>(connection, id, null, null, transaction, commandTimeout);
+        public static async Task<T> GetAsync<T>(this IDbConnection connection, dynamic id, string tableName, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+         => await GetAsync<T>(connection, id, null, null, transaction, commandTimeout);
 
-        //public static async Task<T> GetAsync<T>(this IDbConnection connection, dynamic id, string tableName, string schemaName, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        //{
-        //    return await Instance.GetAsync<T>(connection, id, transaction, commandTimeout, tableName, schemaName);
-        //}
+        public static async Task<T> GetAsync<T>(this IDbConnection connection, dynamic id, string tableName, string schemaName, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return await Instance.GetAsync<T>(connection, id, transaction, commandTimeout, tableName, schemaName);
+        }
 
         #endregion
 
@@ -419,16 +419,16 @@ namespace DapperExtensions
             return Instance.Count<T>(connection, predicate, transaction, commandTimeout, tableName, schemaName);
         }
 
-        //public static async Task<long> CountAsync<T>(this IDbConnection connection, object predicate = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        //    => await CountAsync<T>(connection, null, null, predicate, transaction, commandTimeout);
+        public static async Task<long> CountAsync<T>(this IDbConnection connection, object predicate = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+            => await CountAsync<T>(connection, null, null, predicate, transaction, commandTimeout);
 
-        //public static async Task<long> CountAsync<T>(this IDbConnection connection, string tableName, object predicate = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        //    => await CountAsync<T>(connection, tableName, null, predicate, transaction, commandTimeout);
+        public static async Task<long> CountAsync<T>(this IDbConnection connection, string tableName, object predicate = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+            => await CountAsync<T>(connection, tableName, null, predicate, transaction, commandTimeout);
 
-        //public static async Task<long> CountAsync<T>(this IDbConnection connection, string tableName, string schemaName, object predicate = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
-        //{
-        //    return await Instance.CountAsync<T>(connection, predicate, transaction, commandTimeout, tableName, schemaName);
-        //}
+        public static async Task<long> CountAsync<T>(this IDbConnection connection, string tableName, string schemaName, object predicate = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return await Instance.CountAsync<T>(connection, predicate, transaction, commandTimeout, tableName, schemaName);
+        }
 
         #endregion
 

@@ -23,6 +23,8 @@ namespace DapperExtensions
 
     public class DapperExtensionsConfiguration : IDapperExtensionsConfiguration
     {
+        public DateTime NowTime { get; set; }
+
         private readonly ConcurrentDictionary<Type, IClassMapper> _classMaps = new ConcurrentDictionary<Type, IClassMapper>();
 
         public DapperExtensionsConfiguration()
@@ -32,6 +34,12 @@ namespace DapperExtensions
         public DapperExtensionsConfiguration(IOptions<DataBaseOptions> options)
            : this(typeof(AutoClassMapper<>), new List<Assembly>(), options.Value.sqlDialect)
         {
+            NowTime = DateTime.Now;
+        }
+        public DapperExtensionsConfiguration(ISqlDialect sqlDialect)
+          : this(typeof(AutoClassMapper<>), new List<Assembly>(), sqlDialect)
+        {
+            NowTime = DateTime.Now;
         }
 
 
