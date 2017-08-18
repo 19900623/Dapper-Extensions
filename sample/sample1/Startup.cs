@@ -12,7 +12,6 @@ using sample1.Models;
 using Microsoft.EntityFrameworkCore;
 
 using DapperExtensions;
-using DapperExtensions.Sql;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System.Data;
