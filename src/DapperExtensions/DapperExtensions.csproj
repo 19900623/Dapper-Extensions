@@ -7,7 +7,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>DapperExtensions</AssemblyName>
     <PackageId>Xakep.DapperExtensions</PackageId>
-    <Version>1.6.2.7</Version>
+    <Version>1.6.2.8</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

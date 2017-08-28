@@ -15,6 +15,7 @@ using DapperExtensions;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System.Data;
+using Dapper;
 
 namespace sample1
 {
@@ -78,6 +79,8 @@ namespace sample1
                         var UData = new TestData() { kid = vlist.Last().kid, Name = "Update" };
 
                         con.Update<TestData>(UData);
+
+                       
 
                         var vData = con.Get<TestData>(UData.kid);
                         if (vData != null)

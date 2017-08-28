@@ -226,6 +226,18 @@ namespace DapperExtensions
         {
             return Instance.Update<T>(connection, entity, transaction, commandTimeout, tableName, schemaName, ignoreAllKeyProperties);
         }
+
+        public static bool Update<T>(this IDbConnection connection, T entity, object predicate, IDbTransaction transaction = null, int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
+            => Update<T>(connection, entity, null, null, predicate, transaction, commandTimeout, ignoreAllKeyProperties);
+
+        public static bool Update<T>(this IDbConnection connection, T entity, string tableName, object predicate, IDbTransaction transaction = null, int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
+            => Update<T>(connection, entity, tableName, null, predicate, transaction, commandTimeout, ignoreAllKeyProperties);
+
+        public static bool Update<T>(this IDbConnection connection, T entity, string tableName, string schemaName, object predicate, IDbTransaction transaction = null, int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
+        {
+            return Instance.Update<T>(connection, entity, predicate, transaction, commandTimeout, tableName, schemaName, ignoreAllKeyProperties);
+        }
+
         public static async Task<bool> UpdateAsync<T>(this IDbConnection connection, T entity, IDbTransaction transaction = null, int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
             => await UpdateAsync<T>(connection, entity, null, null, transaction, commandTimeout, ignoreAllKeyProperties);
 
@@ -235,6 +247,16 @@ namespace DapperExtensions
         public static async Task<bool> UpdateAsync<T>(this IDbConnection connection, T entity, string tableName, string schemaName, IDbTransaction transaction = null, int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
         {
             return await Instance.UpdateAsync<T>(connection, entity, transaction, commandTimeout, tableName, schemaName, ignoreAllKeyProperties);
+        }
+        public static async Task<bool> UpdateAsync<T>(this IDbConnection connection, T entity, object predicate, IDbTransaction transaction = null, int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
+            => await UpdateAsync<T>(connection, entity, null, null, predicate, transaction, commandTimeout, ignoreAllKeyProperties);
+
+        public static async Task<bool> UpdateAsync<T>(this IDbConnection connection, T entity, string tableName, object predicate, IDbTransaction transaction = null, int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
+            => await UpdateAsync<T>(connection, entity, tableName, null, predicate, transaction, commandTimeout, ignoreAllKeyProperties);
+
+        public static async Task<bool> UpdateAsync<T>(this IDbConnection connection, T entity, string tableName, string schemaName, object predicate, IDbTransaction transaction = null, int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
+        {
+            return await Instance.UpdateAsync<T>(connection, entity, predicate, transaction, commandTimeout, tableName, schemaName, ignoreAllKeyProperties);
         }
         #endregion
 
@@ -391,6 +413,7 @@ namespace DapperExtensions
         {
             return Instance.GetSet<T>(connection, predicate, sort, firstResult, maxResults, transaction, commandTimeout, buffered, tableName, schemaName);
         }
+
         public static async Task<IEnumerable<T>> GetSetAsync<T>(this IDbConnection connection, object predicate = null, IList<ISort> sort = null, int firstResult = 1, int maxResults = 10, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
             => await GetSetAsync<T>(connection, null, null, predicate, sort, firstResult, maxResults, transaction, commandTimeout);
 
@@ -431,7 +454,6 @@ namespace DapperExtensions
         }
 
         #endregion
-
 
 
         #region GetMultiple

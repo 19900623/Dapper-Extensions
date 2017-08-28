@@ -19,6 +19,7 @@ namespace DapperExtensions
         #region Get
         T Get<T>(IDbConnection connection, dynamic id, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName) where T : class;
         Task<T> GetAsync<T>(IDbConnection connection, dynamic id, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName) where T : class;
+      
         #endregion
 
         #region Insert
@@ -30,6 +31,9 @@ namespace DapperExtensions
         #region Update
         bool Update<T>(IDbConnection connection, T entity, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName, bool ignoreAllKeyProperties) where T : class;
         Task<bool> UpdateAsync<T>(IDbConnection connection, T entity, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName, bool ignoreAllKeyProperties) where T : class;
+        bool Update<T>(IDbConnection connection, T entity, object predicate, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName, bool ignoreAllKeyProperties) where T : class;
+        Task<bool> UpdateAsync<T>(IDbConnection connection, T entity, object predicate, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName, bool ignoreAllKeyProperties) where T : class;
+       
         #endregion
 
         #region Delete
@@ -295,6 +299,55 @@ namespace DapperExtensions
 
             return await connection.ExecuteAsync(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text) > 0;
         }
+        public bool Update<T>(IDbConnection connection, T entity, object predicate, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName = null, bool ignoreAllKeyProperties = false) where T : class
+        {
+            IClassMapper classMap = SqlGenerator.Configuration.GetMap<T>();
+            IPredicate wherePredicate = GetPredicate(classMap, predicate);
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            string sql = SqlGenerator.Update(classMap, wherePredicate, parameters, schemaName, tableName);
+            DynamicParameters dynamicParameters = new DynamicParameters();
+
+            var columns = ignoreAllKeyProperties
+                ? classMap.Properties.Where(p => !(p.Ignored || p.IsReadOnly) && p.KeyType == KeyType.NotAKey)
+                : classMap.Properties.Where(p => !(p.Ignored || p.IsReadOnly || p.KeyType == KeyType.Identity || p.KeyType == KeyType.Assigned));
+
+            foreach (var property in ReflectionHelper.GetObjectValues(entity).Where(property => columns.Any(c => c.Name == property.Key)))
+            {
+                dynamicParameters.Add(property.Key, property.Value);
+            }
+
+            foreach (var parameter in parameters)
+            {
+                dynamicParameters.Add(parameter.Key, parameter.Value);
+            }
+
+            return connection.Execute(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text) > 0;
+        }
+        public async Task<bool> UpdateAsync<T>(IDbConnection connection, T entity, object predicate, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName, bool ignoreAllKeyProperties) where T : class
+        {
+            IClassMapper classMap = SqlGenerator.Configuration.GetMap<T>();
+            IPredicate wherePredicate = GetPredicate(classMap, predicate);
+            Dictionary<string, object> parameters = new Dictionary<string, object>();
+            string sql = SqlGenerator.Update(classMap, wherePredicate, parameters, schemaName, tableName);
+            DynamicParameters dynamicParameters = new DynamicParameters();
+
+            var columns = ignoreAllKeyProperties
+                ? classMap.Properties.Where(p => !(p.Ignored || p.IsReadOnly) && p.KeyType == KeyType.NotAKey)
+                : classMap.Properties.Where(p => !(p.Ignored || p.IsReadOnly || p.KeyType == KeyType.Identity || p.KeyType == KeyType.Assigned));
+
+            foreach (var property in ReflectionHelper.GetObjectValues(entity).Where(property => columns.Any(c => c.Name == property.Key)))
+            {
+                dynamicParameters.Add(property.Key, property.Value);
+            }
+
+            foreach (var parameter in parameters)
+            {
+                dynamicParameters.Add(parameter.Key, parameter.Value);
+            }
+
+            return await connection.ExecuteAsync(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text) > 0;
+        }
+
         #endregion
 
         #region Delete
