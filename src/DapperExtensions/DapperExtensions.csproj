@@ -7,13 +7,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>DapperExtensions</AssemblyName>
     <PackageId>Xakep.DapperExtensions</PackageId>
-    <Version>1.6.2.8</Version>
+    <Version>1.6.2.81</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
  
  <ItemGroup>
-    <PackageReference Include="Dapper" Version="1.50.*" />
+    <PackageReference Include="Dapper" Version="1.50.2.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.0.0" />
