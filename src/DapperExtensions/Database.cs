@@ -147,6 +147,7 @@ namespace DapperExtensions
             return _dapper.SqlGenerator.Configuration.GetMap<T>();
         }
 
+        
     }
 
     public class DataBaseOptions

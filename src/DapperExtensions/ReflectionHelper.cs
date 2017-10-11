@@ -61,7 +61,8 @@ namespace DapperExtensions
             {
                 return result;
             }
-
+            if (obj is IDictionary<string, object>)
+                return obj as IDictionary<string, object>;
 
             foreach (var propertyInfo in obj.GetType().GetProperties())
             {
