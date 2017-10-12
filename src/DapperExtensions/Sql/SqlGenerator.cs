@@ -335,9 +335,10 @@ namespace DapperExtensions.Sql
                 {
                     if (vMapPro.Count == 0)
                         break;
+                    var vAllProperty = itemMap.Value.Mapper.Properties.Where(w => !w.Ignored);
                     for (int i = vMapPro.Count - 1; i >= 0; i--)
                     {
-                        var jitem = itemMap.Value.Mapper.Properties.Where(w => w.Name.Equals(vMapPro[i], StringComparison.OrdinalIgnoreCase));
+                        var jitem = vAllProperty.Where(w => w.Name.Equals(vMapPro[i], StringComparison.OrdinalIgnoreCase));
                         if (jitem.Count() > 0)
                         {
                             ListColumn.Add(new JoinMapper()
