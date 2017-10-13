@@ -327,7 +327,7 @@ namespace DapperExtensions.Sql
                         });
                 }
 
-                var vMapPro = classMap.Properties.Where(p => !p.Ignored).Select(w => w.Name).ToList();
+                var vMapPro = classMap.Properties.Select(w => w.Name).ToList();
 
                 List<JoinMapper> ListColumn = new List<JoinMapper>();
 

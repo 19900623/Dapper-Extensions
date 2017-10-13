@@ -463,21 +463,27 @@ namespace DapperExtensions
 
         public Page<T> GetPages<T>(IDbConnection connection, object predicate, IList<ISort> sort, int page, int resultsPerPage, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName, IList<IJoinPredicate> join, IList<IJoinAliasPredicate> alias) where T : class
         {
-            var build = BuildPage<T>(predicate, sort, page, resultsPerPage, tableName, schemaName, join, alias);
-
             var PageResult = new Page<T>() { CurrentPage = page, ItemsPerPage = resultsPerPage };
             PageResult.TotalItems = Count<T>(connection, predicate, transaction, commandTimeout, tableName, schemaName, join);
-
+            if (PageResult.TotalItems == 0)
+            {
+                PageResult.Items = default(IEnumerable<T>);
+                return PageResult;
+            }
+            var build = BuildPage<T>(predicate, sort, page, resultsPerPage, tableName, schemaName, join, alias);
             PageResult.Items = connection.Query<T>(build.sql, build.dynamicParameters, transaction, false, commandTimeout, CommandType.Text);
             return PageResult;
         }
         public async Task<Page<T>> GetPagesAsync<T>(IDbConnection connection, object predicate, IList<ISort> sort, int page, int resultsPerPage, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName, IList<IJoinPredicate> join, IList<IJoinAliasPredicate> alias) where T : class
         {
-            var build = BuildPage<T>(predicate, sort, page, resultsPerPage, tableName, schemaName, join, alias);
-
             var PageResult = new Page<T>() { CurrentPage = page, ItemsPerPage = resultsPerPage };
             PageResult.TotalItems = await CountAsync<T>(connection, predicate, transaction, commandTimeout, tableName, schemaName, join);
-
+            if (PageResult.TotalItems == 0)
+            {
+                PageResult.Items = default(IEnumerable<T>);
+                return PageResult;
+            }
+            var build = BuildPage<T>(predicate, sort, page, resultsPerPage, tableName, schemaName, join, alias);
             PageResult.Items = await connection.QueryAsync<T>(build.sql, build.dynamicParameters, transaction, commandTimeout, CommandType.Text);
             return PageResult;
         }
