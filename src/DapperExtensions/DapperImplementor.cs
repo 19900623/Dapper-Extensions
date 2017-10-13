@@ -467,7 +467,7 @@ namespace DapperExtensions
             PageResult.TotalItems = Count<T>(connection, predicate, transaction, commandTimeout, tableName, schemaName, join);
             if (PageResult.TotalItems == 0)
             {
-                PageResult.Items = default(IEnumerable<T>);
+                PageResult.Items = new List<T>();
                 return PageResult;
             }
             var build = BuildPage<T>(predicate, sort, page, resultsPerPage, tableName, schemaName, join, alias);
@@ -480,7 +480,7 @@ namespace DapperExtensions
             PageResult.TotalItems = await CountAsync<T>(connection, predicate, transaction, commandTimeout, tableName, schemaName, join);
             if (PageResult.TotalItems == 0)
             {
-                PageResult.Items = default(IEnumerable<T>);
+                PageResult.Items = new List<T>();
                 return PageResult;
             }
             var build = BuildPage<T>(predicate, sort, page, resultsPerPage, tableName, schemaName, join, alias);
