@@ -23,8 +23,8 @@ namespace DapperExtensions.Sql
 
         string IdentitySql(IClassMapper classMap, string schemaName, string tableName);
         string GetTableName(IClassMapper map, string schemaName, string tableName, IList<IJoinPredicate> join = null);
-        string GetColumnName(IClassMapper map, IPropertyMap property, bool includeAlias, string schemaName, string tableName, string aliasName = null);
-        string GetColumnName(IClassMapper map, string propertyName, bool includeAlias, string schemaName, string tableName);
+        string GetColumnName(bool prefix,IClassMapper map, IPropertyMap property, bool includeAlias, string schemaName, string tableName, string aliasName = null);
+        string GetColumnName(bool prefix, IClassMapper map, string propertyName, bool includeAlias, string schemaName, string tableName);
         bool SupportsMultipleStatements();
     }
 
@@ -51,13 +51,13 @@ namespace DapperExtensions.Sql
             if (predicate != null)
             {
                 sql.Append(" WHERE ")
-                    .Append(predicate.GetSql(this, parameters,schemaName,tableName));
+                    .Append(predicate.GetSql(join!=null,this, parameters,schemaName,tableName));
             }
 
             if (sort != null && sort.Any())
             {
                 sql.Append(" ORDER BY ")
-                    .Append(sort.Select(s => s.GetSql(this,schemaName,tableName)).AppendStrings());
+                    .Append(sort.Select(s => s.GetSql(join != null,this, schemaName,tableName)).AppendStrings());
             }
 
             return sql.ToString();
@@ -82,10 +82,10 @@ namespace DapperExtensions.Sql
             if (predicate != null)
             {
                 innerSql.Append(" WHERE ")
-                    .Append(predicate.GetSql(this, parameters,schemaName,tableName));
+                    .Append(predicate.GetSql(join!=null,this, parameters,schemaName,tableName));
             }
 
-            string orderBy = sort.Select(s => s.GetSql(this, schemaName, tableName)).AppendStrings();
+            string orderBy = sort.Select(s => s.GetSql(join != null, this, schemaName, tableName)).AppendStrings();
             innerSql.Append(" ORDER BY " + orderBy);
 
             string sql = Configuration.Dialect.GetPagingSql(innerSql.ToString(), page, resultsPerPage, parameters);
@@ -111,10 +111,10 @@ namespace DapperExtensions.Sql
             if (predicate != null)
             {
                 innerSql.Append(" WHERE ")
-                    .Append(predicate.GetSql(this, parameters,schemaName,tableName));
+                    .Append(predicate.GetSql(join != null, this, parameters,schemaName,tableName));
             }
 
-            string orderBy = sort.Select(s => s.GetSql(this, schemaName, tableName)).AppendStrings();
+            string orderBy = sort.Select(s => s.GetSql(join != null, this, schemaName, tableName)).AppendStrings();
             innerSql.Append(" ORDER BY " + orderBy);
 
             string sql = Configuration.Dialect.GetSetSql(innerSql.ToString(), firstResult, maxResults, parameters);
@@ -136,7 +136,7 @@ namespace DapperExtensions.Sql
             if (predicate != null)
             {
                 sql.Append(" WHERE ")
-                    .Append(predicate.GetSql(this, parameters,schemaName,tableName));
+                    .Append(predicate.GetSql(join != null, this, parameters,schemaName,tableName));
             }
 
             return sql.ToString();
@@ -150,7 +150,7 @@ namespace DapperExtensions.Sql
                 throw new ArgumentException("No columns were mapped.");
             }
 
-            var columnNames = columns.Select(p => GetColumnName(classMap, p, false, schemaName, tableName));
+            var columnNames = columns.Select(p => GetColumnName(false,classMap, p, false, schemaName, tableName));
             var parameters = columns.Select(p => Configuration.Dialect.ParameterPrefix + p.Name);
 
             string sql = string.Format("INSERT INTO {0} ({1}) VALUES ({2})",
@@ -165,7 +165,7 @@ namespace DapperExtensions.Sql
                 if (triggerIdentityColumn.Count > 1)
                     throw new ArgumentException("TriggerIdentity generator cannot be used with multi-column keys");
 
-                sql += string.Format(" RETURNING {0} INTO {1}IdOutParam", triggerIdentityColumn.Select(p => GetColumnName(classMap, p, false, schemaName, tableName)).First(), Configuration.Dialect.ParameterPrefix);
+                sql += string.Format(" RETURNING {0} INTO {1}IdOutParam", triggerIdentityColumn.Select(p => GetColumnName(false,classMap, p, false, schemaName, tableName)).First(), Configuration.Dialect.ParameterPrefix);
             }
 
             return sql;
@@ -193,12 +193,12 @@ namespace DapperExtensions.Sql
                 columns.Select(
                     p =>
                     string.Format(
-                        "{0} = {1}{2}", GetColumnName(classMap, p, false, schemaName, tableName), Configuration.Dialect.ParameterPrefix, p.Name));
+                        "{0} = {1}{2}", GetColumnName(false,classMap, p, false, schemaName, tableName), Configuration.Dialect.ParameterPrefix, p.Name));
 
             return string.Format("UPDATE {0} SET {1} WHERE {2}",
                 GetTableName(classMap, schemaName, tableName),
                 setSql.AppendStrings(),
-                predicate.GetSql(this, parameters,schemaName,tableName));
+                predicate.GetSql(false,this, parameters,schemaName,tableName));
         }
 
         public virtual string UpdateSet(IClassMapper classMap, object entity, IPredicate predicate, IDictionary<string, object> parameters, string schemaName, string tableName)
@@ -223,12 +223,12 @@ namespace DapperExtensions.Sql
                 columns.Where(w => vColName.Contains(w.Name)).Select(
                     p =>
                     string.Format(
-                        "{0} = {1}{2}", GetColumnName(classMap, p, false, schemaName, tableName), Configuration.Dialect.ParameterPrefix, p.Name));
+                        "{0} = {1}{2}", GetColumnName(false,classMap, p, false, schemaName, tableName), Configuration.Dialect.ParameterPrefix, p.Name));
 
             return string.Format("UPDATE {0} SET {1} WHERE {2}",
                 GetTableName(classMap, schemaName, tableName),
                 setSql.AppendStrings(),
-                predicate.GetSql(this, parameters, schemaName, tableName));
+                predicate.GetSql(false,this, parameters, schemaName, tableName));
         }
 
         public virtual string Delete(IClassMapper classMap, IPredicate predicate, IDictionary<string, object> parameters, string schemaName, string tableName)
@@ -244,7 +244,7 @@ namespace DapperExtensions.Sql
             }
 
             StringBuilder sql = new StringBuilder(string.Format("DELETE FROM {0}", GetTableName(classMap, schemaName, tableName)));
-            sql.Append(" WHERE ").Append(predicate.GetSql(this, parameters,schemaName,tableName));
+            sql.Append(" WHERE ").Append(predicate.GetSql(false,this, parameters,schemaName,tableName));
             return sql.ToString();
         }
         
@@ -259,7 +259,7 @@ namespace DapperExtensions.Sql
             {
                 var baseClassMap = join[0].GetLeftMapper(this);
                 var baseTable = GetTableName(baseClassMap, join[0].SchemaName, join[0].TableName);
-                return $"{baseTable} {string.Join(" ", join.Select(w => w.GetSql(this, null, null, null)))}";
+                return $"{baseTable} {string.Join(" ", join.Select(w => w.GetSql(join != null, this, null, null, null)))}";
             }
 
             schemaName = string.IsNullOrWhiteSpace(schemaName) ? map.SchemaName : schemaName;
@@ -267,7 +267,7 @@ namespace DapperExtensions.Sql
             return Configuration.Dialect.GetTableName(schemaName, tableName, null);
         }
 
-        public virtual string GetColumnName(IClassMapper map, IPropertyMap property, bool includeAlias, string schemaName, string tableName, string aliasName = null)
+        public virtual string GetColumnName(bool prefix, IClassMapper map, IPropertyMap property, bool includeAlias, string schemaName, string tableName, string aliasName = null)
         {
             string alias = null;
             string propertyName = property.Name;
@@ -280,10 +280,10 @@ namespace DapperExtensions.Sql
                 alias = propertyName;
             }
 
-            return Configuration.Dialect.GetColumnName(GetTableName(map, schemaName, tableName), property.ColumnName, alias);
+            return Configuration.Dialect.GetColumnName(prefix ? GetTableName(map, schemaName, tableName) : null, property.ColumnName, alias);
         }
 
-        public virtual string GetColumnName(IClassMapper map, string propertyName, bool includeAlias, string schemaName, string tableName)
+        public virtual string GetColumnName(bool prefix, IClassMapper map, string propertyName, bool includeAlias, string schemaName, string tableName)
         {
             IPropertyMap propertyMap = map.Properties.SingleOrDefault(p => p.Name.Equals(propertyName, StringComparison.InvariantCultureIgnoreCase));
             if (propertyMap == null)
@@ -291,7 +291,7 @@ namespace DapperExtensions.Sql
                 throw new ArgumentException(string.Format("Could not find '{0}' in Mapping.", propertyName));
             }
 
-            return GetColumnName(map, propertyMap, includeAlias,schemaName, tableName);
+            return GetColumnName(prefix,map, propertyMap, includeAlias,schemaName, tableName);
         }
 
         public virtual bool SupportsMultipleStatements()
@@ -387,13 +387,13 @@ namespace DapperExtensions.Sql
                     }
                 }
 
-                var jcolumns = ListColumn.Select(p => GetColumnName(p.Mapper, p.Propertry, true, p.SchemaName, p.TableName, p.AliasName));
+                var jcolumns = ListColumn.Select(p => GetColumnName(true,p.Mapper, p.Propertry, true, p.SchemaName, p.TableName, p.AliasName));
                 return jcolumns.AppendStrings();
             }
 
             var columns = classMap.Properties
                 .Where(p => !p.Ignored)
-                .Select(p => GetColumnName(classMap, p, true, schemaName, tableName));
+                .Select(p => GetColumnName(false,classMap, p, true, schemaName, tableName));
             return columns.AppendStrings();
         }
 
