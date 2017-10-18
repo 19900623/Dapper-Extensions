@@ -202,6 +202,12 @@ namespace DapperExtensions
     public interface IPredicate
     {
         /// <summary>
+        /// 返回条件的类
+        /// </summary>
+        /// <returns></returns>
+        Type GetPredicateType();
+
+        /// <summary>
         /// 返回条件的sql
         /// </summary>
         /// <param name="sqlGenerator"></param>
@@ -238,6 +244,8 @@ namespace DapperExtensions
     /// </summary>
     public abstract class BasePredicate : IBasePredicate
     {
+        public abstract Type GetPredicateType();
+
         /// <summary>
         /// 返回sql
         /// </summary>
@@ -339,6 +347,10 @@ namespace DapperExtensions
     public class FieldPredicate<T> : ComparePredicate, IFieldPredicate
         where T : class
     {
+        public override Type GetPredicateType()
+        {
+            return typeof(T);
+        }
         public object Value { get; set; }
 
         public override string GetSql(bool prefix, ISqlGenerator sqlGenerator, IDictionary<string, object> parameters, string schemaName, string tableName)
@@ -374,6 +386,10 @@ namespace DapperExtensions
 
     public class FieldPredicate : ComparePredicate, IFieldPredicate
     {
+        public override Type GetPredicateType()
+        {
+            return FieldType;
+        }
         public Type FieldType { get; set; }
 
         public object Value { get; set; }
@@ -424,6 +440,10 @@ namespace DapperExtensions
         where T : class
         where T2 : class
     {
+        public override Type GetPredicateType()
+        {
+            return typeof(T);
+        }
         public string PropertyName2 { get; set; }
 
         public JoinOperator Join { get; set; }
@@ -462,6 +482,10 @@ namespace DapperExtensions
       where T : class
       where T2 : class
     {
+        public override Type GetPredicateType()
+        {
+            return typeof(T);
+        }
         public string PropertyName2 { get; set; }
 
         public IClassMapper GetRightMapper(ISqlGenerator sqlGenerator)
@@ -494,6 +518,10 @@ namespace DapperExtensions
         where T : class
         where T2 : class
     {
+        public override Type GetPredicateType()
+        {
+            return typeof(T);
+        }
         public string PropertyName2 { get; set; }
         public string SchemaName2 { get; set; }
         public string TableName2 { get; set; }
@@ -523,6 +551,10 @@ namespace DapperExtensions
     public class BetweenPredicate<T> : BasePredicate, IBetweenPredicate
         where T : class
     {
+        public override Type GetPredicateType()
+        {
+            return typeof(T);
+        }
         public override string GetSql(bool prefix, ISqlGenerator sqlGenerator, IDictionary<string, object> parameters, string schemaName, string tableName)
         {
             string columnName = GetColumnName(prefix, typeof(T), sqlGenerator, PropertyName, SchemaName ?? schemaName, TableName ?? tableName);
@@ -583,6 +615,10 @@ namespace DapperExtensions
     /// </summary>
     public class PredicateGroup : IPredicateGroup
     {
+        public Type GetPredicateType()
+        {
+            return null;
+        }
         public GroupOperator Operator { get; set; }
         public IList<IPredicate> Predicates { get; set; }
         public string GetSql(bool prefix, ISqlGenerator sqlGenerator, IDictionary<string, object> parameters, string schemaName, string tableName)
@@ -609,6 +645,10 @@ namespace DapperExtensions
     public class ExistsPredicate<TSub> : IExistsPredicate
         where TSub : class
     {
+        public Type GetPredicateType()
+        {
+            return typeof(TSub);
+        }
         public IPredicate Predicate { get; set; }
         public bool Not { get; set; }
 
