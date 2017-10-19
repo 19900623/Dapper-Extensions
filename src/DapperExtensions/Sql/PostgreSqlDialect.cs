@@ -35,6 +35,24 @@ namespace DapperExtensions.Sql
         {
             return base.GetTableName(schemaName, tableName, alias);//.ToLower();
         }
+        public override string GetOperatorString(Operator Operator, bool Not)
+        {
+            switch (Operator)
+            {
+                case Operator.Gt:
+                    return Not ? "<=" : ">";
+                case Operator.Ge:
+                    return Not ? "<" : ">=";
+                case Operator.Lt:
+                    return Not ? ">=" : "<";
+                case Operator.Le:
+                    return Not ? ">" : "<=";
+                case Operator.Like:
+                    return Not ? "NOT ILIKE" : "ILIKE";
+                default:
+                    return Not ? "<>" : "=";
+            }
+        }
     }
 
 }

@@ -26,6 +26,7 @@ namespace DapperExtensions.Sql
         string GetColumnName(bool prefix,IClassMapper map, IPropertyMap property, bool includeAlias, string schemaName, string tableName, string aliasName = null);
         string GetColumnName(bool prefix, IClassMapper map, string propertyName, bool includeAlias, string schemaName, string tableName);
         bool SupportsMultipleStatements();
+        string GetOperatorString(Operator Operator, bool Not);
     }
 
     public class SqlGeneratorImpl : ISqlGenerator
@@ -396,6 +397,8 @@ namespace DapperExtensions.Sql
                 .Select(p => GetColumnName(false,classMap, p, true, schemaName, tableName));
             return columns.AppendStrings();
         }
+
+        public string GetOperatorString(Operator Operator, bool Not) => Configuration.Dialect.GetOperatorString(Operator, Not);
 
         internal class JoinMapper
         {

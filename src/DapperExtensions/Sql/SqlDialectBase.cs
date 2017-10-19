@@ -20,6 +20,7 @@ namespace DapperExtensions.Sql
         string GetSetSql(string sql, int firstResult, int maxResults, IDictionary<string, object> parameters);
         bool IsQuoted(string value);
         string QuoteString(string value);
+        string GetOperatorString(Operator Operator, bool Not);
     }
 
     public abstract class SqlDialectBase : ISqlDialect
@@ -131,6 +132,25 @@ namespace DapperExtensions.Sql
         public virtual string UnQuoteString(string value)
         {
             return IsQuoted(value) ? value.Substring(1, value.Length - 2) : value;
+        }
+
+        public virtual string GetOperatorString(Operator Operator, bool Not)
+        {
+            switch (Operator)
+            {
+                case Operator.Gt:
+                    return Not ? "<=" : ">";
+                case Operator.Ge:
+                    return Not ? "<" : ">=";
+                case Operator.Lt:
+                    return Not ? ">=" : "<";
+                case Operator.Le:
+                    return Not ? ">" : "<=";
+                case Operator.Like:
+                    return Not ? "NOT LIKE" : "LIKE";
+                default:
+                    return Not ? "<>" : "=";
+            }
         }
     }
 }

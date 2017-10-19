@@ -319,24 +319,7 @@ namespace DapperExtensions
         public Operator Operator { get; set; }
         public bool Not { get; set; }
 
-        public virtual string GetOperatorString()
-        {
-            switch (Operator)
-            {
-                case Operator.Gt:
-                    return Not ? "<=" : ">";
-                case Operator.Ge:
-                    return Not ? "<" : ">=";
-                case Operator.Lt:
-                    return Not ? ">=" : "<";
-                case Operator.Le:
-                    return Not ? ">" : "<=";
-                case Operator.Like:
-                    return Not ? "NOT LIKE" : "LIKE";
-                default:
-                    return Not ? "<>" : "=";
-            }
-        }
+        public virtual string GetOperatorString(ISqlGenerator sqlGenerator) => sqlGenerator.GetOperatorString(Operator, Not);
     }
 
     public interface IFieldPredicate : IComparePredicate
@@ -380,7 +363,7 @@ namespace DapperExtensions
             }
 
             string parameterName = parameters.SetParameterName(this.PropertyName, this.Value, sqlGenerator.Configuration.Dialect.ParameterPrefix);
-            return string.Format("({0} {1} {2})", columnName, GetOperatorString(), parameterName);
+            return string.Format("({0} {1} {2})", columnName, GetOperatorString(sqlGenerator), parameterName);
         }
     }
 
@@ -421,7 +404,7 @@ namespace DapperExtensions
             }
 
             string parameterName = parameters.SetParameterName(this.PropertyName, this.Value, sqlGenerator.Configuration.Dialect.ParameterPrefix);
-            return string.Format("({0} {1} {2})", columnName, GetOperatorString(), parameterName);
+            return string.Format("({0} {1} {2})", columnName, GetOperatorString(sqlGenerator), parameterName);
         }
     }
 
@@ -467,7 +450,7 @@ namespace DapperExtensions
             string columnName = GetColumnName(true,typeof(T), sqlGenerator, PropertyName, SchemaName ?? schemaName, TableName ?? tableName);
             string columnName2 = GetColumnName(true,typeof(T2), sqlGenerator, PropertyName2, SchemaName2, TableName2);
             string vjoin = Join == JoinOperator.Full ? "full join" : Join == JoinOperator.Left ? "left join" : Join == JoinOperator.Right ? "right join" : "inner join";
-            return $" {vjoin} {righttable} on {columnName} {GetOperatorString()} {columnName2}";
+            return $" {vjoin} {righttable} on {columnName} {GetOperatorString(sqlGenerator)} {columnName2}";
         }
     }
 
@@ -530,7 +513,7 @@ namespace DapperExtensions
         {
             string columnName = GetColumnName(prefix,typeof(T), sqlGenerator, PropertyName, SchemaName ?? schemaName, TableName ?? tableName);
             string columnName2 = GetColumnName(prefix, typeof(T2), sqlGenerator, PropertyName2, schemaName, tableName);
-            return string.Format("({0} {1} {2})", columnName, GetOperatorString(), columnName2);
+            return string.Format("({0} {1} {2})", columnName, GetOperatorString(sqlGenerator), columnName2);
         }
     }
 
