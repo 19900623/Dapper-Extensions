@@ -35,6 +35,8 @@ namespace DapperExtensions.Mapper
         /// Gets or sets the table to use in the database.
         /// </summary>
         public string TableName { get; protected set; }
+        private bool _HasDefinedKey = true;
+        public bool HasDefinedKey { get { return _HasDefinedKey; } protected set { _HasDefinedKey = value; } }
 
         /// <summary>
         /// A collection of properties that will map to columns in the database table.
@@ -77,6 +79,10 @@ namespace DapperExtensions.Mapper
         {
             TableName = tableName;
         }
+        public virtual void DefinedKey(bool hasDefinedKey)
+        {
+            HasDefinedKey = hasDefinedKey;
+        }
 
         protected virtual void AutoMap()
         {
@@ -101,14 +107,14 @@ namespace DapperExtensions.Mapper
                 }
 
                 PropertyMap map = Map(propertyInfo);
-                if (!hasDefinedKey)
+                if (!hasDefinedKey && _HasDefinedKey)
                 {
-                    if (string.Equals(map.PropertyInfo.Name, "id", StringComparison.InvariantCultureIgnoreCase))
+                    if (string.Equals(map.PropertyInfo.Name, "id", StringComparison.InvariantCultureIgnoreCase) && !map.Ignored && !map.IsReadOnly)
                     {
                         keyMap = map;
                     }
 
-                    if (keyMap == null && map.PropertyInfo.Name.EndsWith("id", true, CultureInfo.InvariantCulture))
+                    if (keyMap == null && map.PropertyInfo.Name.EndsWith("id", true, CultureInfo.InvariantCulture) && !map.Ignored && !map.IsReadOnly)
                     {
                         keyMap = map;
                     }

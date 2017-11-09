@@ -20,7 +20,22 @@ namespace DapperExtensions.Mapper
             Table(TableName);// Table(type.Name);
             if (vTable.Length > 0 && !string.IsNullOrWhiteSpace((vTable[0] as TableAttribute).Schema))
                 Schema((vTable[0] as TableAttribute).Schema);
+
+            var vNotKey = type.GetTypeInfo().GetCustomAttributes(typeof(NotKeyAttribute), true).ToArray();
+            if (vNotKey.Length > 0)
+                DefinedKey(false);
             AutoMap();
         }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class NotKeyAttribute : Attribute
+    {
+        public NotKeyAttribute()
+        {
+            NoDefinedKey = true;
+        }
+
+        public bool NoDefinedKey { get; set; }
     }
 }
